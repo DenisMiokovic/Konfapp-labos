@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" >
+		<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.css}" >
+		<title th:text="#{msg.conference}"></title>
+	</head>
+	<body>
+		<h1 th:text="#{msg.conference}"></h1>
+		<img th:src="@{~/images/firma.png}" />
+		
+		<form action="/resetBrojac">
+    		<input type="submit" th:value="#{msg.resetCounter}" class="btn btn-warning" style="background-color: orange"/>
+		</form>
+		
+		<div sec:authorize="isAuthenticated()">
+			<a th:href="@{/novoPredavanje}" class="btn btn-primary" th:text="#{msg.newLectureButton}"></a>
+			<a th:href="@{/svaPredavanja}" class="btn btn-primary" th:text="#{msg.allLecturesButton}"></a>
+            <a th:href="@{/pretragaPredavanja}" class="btn btn-primary" th:text="#{msg.searchLecturesButton}"></a>
+		</div>
+		
+		<div sec:authorize="isAuthenticated()">
+			<form method="POST" th:action="@{/logout}"><span th:text="#{msg.loggedAs}"></span><span sec:authentication="name">Korisnik</span>
+				<input type="submit" th:value="#{msg.logoutButton}" class="btn btn-danger" />
+			</form>
+		</div>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js">
+		</script>
+		<script type="text/javascript">
+		$(document).ready(function() {
+			$("#locales").change(function () {
+				var selectedOption = $('#locales').val();
+				if (selectedOption != '') {
+					window.location.replace('?language=' + selectedOption);
+				}
+			});
+		});
+		</script>
+		<label th:text="#{msg.currentLanguage}"></label>
+		<p>
+			<select id="locales">
+				<option value="hr"
+					th:selected="${#locale.language == 'hr'}"
+					th:text="#{msg.lang.hr}"></option>
+				<option value="en"
+					th:selected="${#locale.language == 'en'}"
+					th:text="#{msg.lang.en}"></option>
+			</select>
+		</p>
+		
+		<table>
+  			<tr>
+			    <th th:text="#{msg.subjectLabel}"></th>
+			    <th th:text="#{msg.abstractLabel}"></th>
+			    <th th:text="#{msg.typeLabel}"></th>
+			    <th th:text="#{msg.lecturer.nameLabel}"></th>
+			    <th th:text="#{msg.lecturer.positionLabel}"></th>
+			</tr>
+			<tr th:each="predavanje : ${listaPredavanja}">
+				<td><span th:text="${predavanje.tema}" >PREDAVANJE.TEMA</span></td>
+				<td><span th:text="${predavanje.kratkiSadrzaj}" >PREDAVANJE.KRATKISADRZAJ</span></td>
+				<td><span th:text="${predavanje.vrstaPredavanja}" >PREDAVANJE.VRSTAPREDAVANJA</span></td>
+				<td><span th:text="${predavanje.predavac.ime}" >PREDAVAC.IME</span></td>
+				<td><span th:text="${predavanje.predavac.pozicijaPredavaca}" >PREDAVAC.POZICIJAPREDAVACA</span></td>
+			</tr>
+		
+		</table>
+
+</body>
+</html>

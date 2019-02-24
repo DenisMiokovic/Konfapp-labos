@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" >
+		<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.css}" >
+		<title th:text="#{msg.conference}"></title>
+	</head>
+	<body>
+		<h1 th:text="#{msg.conference}"></h1>
+		<img th:src="@{~/images/firma.png}" />
+		
+		<form action="/resetBrojac">
+    		<input type="submit" th:value="#{msg.resetCounter}" class="btn btn-warning" style="background-color: orange"/>
+		</form>
+		
+		<div sec:authorize="isAuthenticated()">
+			<a th:href="@{/novoPredavanje}" class="btn btn-primary" th:text="#{msg.newLectureButton}"></a>
+			<a th:href="@{/svaPredavanja}" class="btn btn-primary" th:text="#{msg.allLecturesButton}"></a>
+            <a th:href="@{/pretragaPredavanja}" class="btn btn-primary" th:text="#{msg.searchLecturesButton}"></a>
+		</div>
+		
+		<div sec:authorize="isAuthenticated()">
+			<form method="POST" th:action="@{/logout}"><span th:text="#{msg.loggedAs}"></span><span sec:authentication="name">Korisnik</span>
+				<input type="submit" th:value="#{msg.logoutButton}" class="btn btn-danger" />
+			</form>
+		</div>
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js">
+		</script>
+		<script type="text/javascript">
+		$(document).ready(function() {
+			$("#locales").change(function () {
+				var selectedOption = $('#locales').val();
+				if (selectedOption != '') {
+					window.location.replace('?language=' + selectedOption);
+				}
+			});
+		});
+		</script>
+		<label th:text="#{msg.currentLanguage}"></label>
+		<p>
+			<select id="locales">
+				<option value="hr"
+					th:selected="${#locale.language == 'hr'}"
+					th:text="#{msg.lang.hr}"></option>
+				<option value="en"
+					th:selected="${#locale.language == 'en'}"
+					th:text="#{msg.lang.en}"></option>
+			</select>
+		</p>
+		
+		<h3 th:text="#{msg.newLectureHeader}"></h3>
+		<form method="POST" th:object="${predavanje}">
+		
+			<div class="form-row">
+				<div class="form-group column">
+					<label for="predavac.ime" th:text="#{msg.lecturerLabel}"></label>
+					<input type="text" th:field="*{predavac.ime}" />
+					<span class="validation-error" th:if="${#fields.hasErrors('predavac.ime')}" th:errors="*{predavac.ime}">Ime Error</span>
+				</div>
+				
+				<div class="form-group column">
+					<label for="predavac.pozicijaPredavaca" th:text="#{msg.lecturer.position}"></label>
+					<select th:field="*{predavac.pozicijaPredavaca}">
+						<option value="" th:text="#{msg.optionValue}"></option>
+						<option th:each="pozicija : ${pozicije}" th:value="${pozicija}" th:text="${pozicija}"></option>
+					</select>
+					<span class="validation-error" th:if="${#fields.hasErrors('predavac.pozicijaPredavaca')}" th:errors="*{predavac.pozicijaPredavaca}">Pozicija Error</span>
+				</div>
+			</div>
+			
+			<div class="form-group">
+				<label for="tema" th:text="#{msg.lecture.subject}"></label>
+				<input type="text" th:field="*{tema}" />
+				<span class="validation-error" th:if="${#fields.hasErrors('tema')}" th:errors="*{tema}">Tema Error</span>
+			</div>
+				
+			<div class="form-group">
+				<label for="kratkiSadrzaj" th:text="#{msg.lecture.abstract}"></label>
+				<textarea rows="6" th:field="*{kratkiSadrzaj}"></textarea>
+				<span class="validation-error" th:if="${#fields.hasErrors('kratkiSadrzaj')}" th:errors="*{kratkiSadrzaj}">KratkiSadrzaj Error</span>
+			</div>
+				
+			<div class="form-group">
+				<label for="vrstaPredavanja" th:text="#{msg.lecture.type}"></label>
+				<select th:field="*{vrstaPredavanja}">
+					<option value="" th:text="#{msg.optionValue}"></option>
+					<option th:each="vrsta : ${vrste}" th:value="${vrsta}" th:text="${vrsta}"></option>
+				</select>
+				<span class="validation-error" th:if="${#fields.hasErrors('vrstaPredavanja')}" th:errors="*{vrstaPredavanja}">Vrsta Error</span>
+			</div>
+			
+			<table sec:authorize="hasRole('ROLE_ADMIN')">
+				<tr><td><label for="objavljeno" th:text="#{msg.lecture.published}"></label><input type="checkbox" th:field="*{objavljeno}"></td>			
+				</tr>
+			</table>
+			
+			<div class="form-group">
+				<input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+				<input type="submit" th:value="#{msg.propose}">
+			</div>
+			
+		</form>
+	</body>
+</html>
